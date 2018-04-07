@@ -8,13 +8,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     private Button subscribe;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         subscribe = findViewById(R.id.subscribe);
         subscribeTopic = (EditText) findViewById(R.id.subscribeTopic);
         client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
+
         client.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
@@ -44,20 +46,54 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-               /* for(int i=0;i<10;i++)
-                {
-                Log.d("Message Arived MQTT", new String(mqttMessage.getPayload()));
-                }
+            public void messageArrived(String s, MqttMessage mqttMessage) throws Exception
+            {
+                String topic = subscribeTopic.getText().toString().trim();
+                Log.d("receiving message from", topic);
+               //byte receives entire pyayload
+
+                //final byte[] payload = mqttMessage.getPayload();
+                //Log.d(" message is", String.valueOf((payload)));
+
+                //iterate over the byte to retrieve all values
+                //double n=mqttMessage.getPayload().length;
+                //Log.d(" length is", String.valueOf(n));
+               // Object o=new Object();
+                //o=mqttMessage.getPayload();
+
+              //today
+                JsonParser parser = new JsonParser();
+                String payload = new String(mqttMessage.getPayload());
+                //Log.d(" message is", String.valueOf((payload)));
+                JsonObject jsonObject = parser.parse(payload).getAsJsonObject();
+                Log.d("message", String.valueOf((jsonObject)));
+
+
+               // System.out.print(o);
+               /* JSONObject jobj = (JSONObject)o;
+                double jdoub1 = jobj.getDouble("lat");
+                double jdoub2 = jobj.getDouble("long");
+                System.out.println(jdoub1);
+                System.out.println(jdoub2);
 */
-              final byte[] payload=mqttMessage.getPayload();
-                Log.d("msg", Arrays.toString(payload));//receives only the first value
 
+               /* for(byte b : payload) {
+                    JSONObject jobj = new JSONObject(payload.toString());
+                    double jdoub1 = jobj.getDouble("lat");
+                    double jdoub2 = jobj.getDouble("long");
+                    System.out.println(jdoub1);
+                    System.out.println(jdoub2);
+                }
 
+                */
 
+// gives all values and displays map once
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-                intent.putExtra("message", payload);
+                intent.putExtra("message",String.valueOf((jsonObject)) );
                 startActivity(intent);
+
+
+
 
 
 
@@ -69,14 +105,10 @@ public class MainActivity extends AppCompatActivity {
 
 
             @Override
-            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken)
+            {
 
             }
-
-
-
-
-
         }
         );
 
@@ -87,11 +119,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String topic = subscribeTopic.getText().toString().trim();
-               // Log.v("topic", "I REACH HERE " + topic);   testing purpose
+
                 if (!topic.isEmpty()) {
                     try {
-                        //Log.v("CLICK_CHECK","CLICKED"); testing purpose
-                        pahoMqttClient.subscribe(client, topic, 1);
+                        pahoMqttClient.subscribe(client, topic, 0);//originaly qos=1
                     } catch (MqttException e) {
                         e.printStackTrace();
                     }

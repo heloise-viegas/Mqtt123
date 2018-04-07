@@ -1,7 +1,8 @@
 package com.example.heloise.mqtt123;
 
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,6 +14,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    String l1="",l2="";
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +30,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         Bundle bundle = getIntent().getExtras();
-        String message = bundle.getString("message");
+        String value1=bundle.getString("message");
+        Log.d("print:",value1);
+        String s1[]=value1.split(",");
+        Log.d("print1",s1[0]);
+        Log.d("print1",s1[1]);
+        l1=s1[0].substring(7);
+         l2=s1[1].substring(7,17);
+        Log.d("print2",l1);
+        Log.d("print2",l2);
+
+
+
+       // double value=Double.parseDouble(value1);
+       // Log.d("print:", String.valueOf(value));
+
+
+        //new
+       /* JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(String.valueOf(bundle)).getAsJsonObject();
+        latt=jsonObject.getAsJsonObject("lat");
+        v=latt.getAsInt();
+        Log.d("message", String.valueOf((v)));*/
 
     }
 
@@ -44,7 +70,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        //double d1=Double.parseDouble(l1);
+        //double d2=Double.parseDouble(l2);
+        LatLng sydney = new LatLng(Double.valueOf(l1),Double.valueOf(l2));
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
