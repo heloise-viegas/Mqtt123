@@ -3,6 +3,7 @@ package com.example.heloise.mqtt123;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -21,7 +22,7 @@ public class PahoMqttClient {
     private static final String TAG = "PahoMqttClient";
     private MqttAndroidClient mqttAndroidClient;
 
-    public MqttAndroidClient getMqttClient(Context context, String brokerUrl, String clientId) {
+    public MqttAndroidClient getMqttClient(final Context context, String brokerUrl, String clientId) {
 
         mqttAndroidClient = new MqttAndroidClient(context, brokerUrl, clientId);
         try {
@@ -30,7 +31,11 @@ public class PahoMqttClient {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     mqttAndroidClient.setBufferOpts(getDisconnectedBufferOptions());
-                    Log.d(TAG, "Success");
+                    CharSequence text = "Successfully connected to MQTT Broker";
+                    int duration = Toast.LENGTH_LONG;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
                 }
 
                 @Override

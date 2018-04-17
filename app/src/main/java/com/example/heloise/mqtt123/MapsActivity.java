@@ -1,8 +1,16 @@
 package com.example.heloise.mqtt123;
 
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.Manifest;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,11 +18,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
     private GoogleMap mMap;
-    String l1="",l2="";
+    Double longi, lat;
+
 
 
 
@@ -28,31 +39,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+//        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        Bundle bundle = getIntent().getExtras();
-        String value1=bundle.getString("message");
-        Log.d("print:",value1);
-        String s1[]=value1.split(",");
-        Log.d("print1",s1[0]);
-        Log.d("print1",s1[1]);
-        l1=s1[0].substring(7);
-         l2=s1[1].substring(7,17);
-        Log.d("print2",l1);
-        Log.d("print2",l2);
+//        Bundle bundle = getIntent().getExtras();
+//        String value1=bundle.getString("message");
+//        JsonParser parser = new JsonParser();
+//        JsonObject json = (JsonObject) parser.parse(value1);
+//        lat = String.valueOf(json.get("lat"));
+//        longi = String.valueOf(json.get("long"));
 
-
-
-       // double value=Double.parseDouble(value1);
-       // Log.d("print:", String.valueOf(value));
-
-
-        //new
-       /* JsonParser parser = new JsonParser();
-        JsonObject jsonObject = parser.parse(String.valueOf(bundle)).getAsJsonObject();
-        latt=jsonObject.getAsJsonObject("lat");
-        v=latt.getAsInt();
-        Log.d("message", String.valueOf((v)));*/
-
+          lat = 15.4884442;
+         longi = 73.8171119;
     }
 
 
@@ -69,11 +66,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        //double d1=Double.parseDouble(l1);
-        //double d2=Double.parseDouble(l2);
-        LatLng sydney = new LatLng(Double.valueOf(l1),Double.valueOf(l2));
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing.
+//            PermissionUtils.requestPermission(this, 1,
+//                    Manifest.permission.ACCESS_FINE_LOCATION, true);
+        } else if (mMap != null) {
+            // Access to the location has been granted to the app.
+            mMap.setMyLocationEnabled(true);
+            mMap.setOnMyLocationButtonClickListener(this);
+            mMap.setOnMyLocationClickListener(this);
+
+        }
+
+        LatLng sydney = new LatLng(lat,longi);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(this, "Button clicked", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+    @Override
+    public void onMyLocationClick(Location location){
+        Toast.makeText(this, "Curren location:\n" + location, Toast.LENGTH_LONG).show();
     }
 }
