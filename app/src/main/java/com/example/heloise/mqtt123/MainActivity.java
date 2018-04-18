@@ -43,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
         panjim_button = findViewById(R.id.panjim_button);
 
 
+        // Move this callback code to MapsActivity
         this.client = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.MQTT_BROKER_URL, Constants.CLIENT_ID);
-
-
         this.client.setCallback(new MqttCallbackExtended() {
                                     @Override
                                     public void connectComplete(boolean b, String s) {
@@ -108,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("Vasco Button", "Hello from Vasco");
+                Double vLat = 15.3929768, vLong = 73.7820748;
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                intent.putExtra("lat", vLat);
+                intent.putExtra("long", vLong);
                 startActivity(intent);
             }
         });
